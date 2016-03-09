@@ -1,0 +1,30 @@
+doctype html
+html
+  head
+    title= @title || "課程匯入"
+    = stylesheet_link_tag 'application', media: 'all'
+    = javascript_include_tag 'application'
+    = csrf_meta_tags
+    meta name="viewport" content="width=device-width,initial-scale=1"
+    meta property="og:title" content="#{@title || "課程匯入"}"
+    meta property="og:type" content="website"
+    meta property="og:image" content="http://i.imgur.com/q0JpWQ6.jpg"
+    meta property="og:site_name" content="課程匯入"
+    link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/monokai-sublime.min.css"
+    script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/highlight.min.js"
+
+  body
+    .container-fluid
+      = render 'partials/navbar'
+
+      .flash-area
+        - flash.each do |k, v|
+          - if v != true
+            p class="alert alert-info alert-dismissible" role="alert"
+              button type="button" class="close" data-dismiss="alert" aria-label="Close"
+                span aria-hidden="true" &times;
+              = v
+      = yield
+
+  javascript:
+    hljs.initHighlightingOnLoad();

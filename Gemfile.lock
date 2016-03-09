@@ -370,6 +370,7 @@ DEPENDENCIES
   kaminari
   letter_opener
   meta_request
+  method_source
   nokogiri
   omniauth-colorgy-oauth2
   pg
@@ -396,3 +397,6 @@ DEPENDENCIES
   thin
   uglifier (>= 1.3.0)
   web-console (~> 2.0)
+
+BUNDLED WITH
+   1.11.2

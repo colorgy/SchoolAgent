@@ -1,0 +1,14 @@
+.container-fluid#agent-show
+  h3 Login Fields
+  ul
+    - @agent_class::LOGIN_FIELDS.each do |key, v|
+      li = "#{key.to_s}, #{v.to_s}"
+
+  h3 #initialize
+  pre
+    code
+      = @agent_class.instance_method(:initialize).source
+  h3 #fetch
+  pre
+    code
+      = @agent_class.instance_method(:fetch).source

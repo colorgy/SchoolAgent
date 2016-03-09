@@ -7,9 +7,12 @@ Rails.application.routes.draw do
   # root 'welcome#index'
   root 'page#index'
   get 'about' => 'page#about', as: :about
+  get 'contribution' => 'page#contribution', as: :contribution
 
   get  '/import' => 'import#index', as: :import
   post '/import' => 'import#import_course', as: :import_course
+
+  resources :agents, only: [:index, :show]
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

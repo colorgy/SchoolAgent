@@ -24,8 +24,22 @@ module Mixins
       @doc = Nokogiri::HTML(new_content)
     end
 
-    def view_state
-      @doc && Hash[ @doc.css('input[type="hidden"]').map{|input| [input[:name], input[:value]]} ]
+    def view_state doc=nil
+      if doc
+        Hash[ doc.css('input[type="hidden"]').map{|input| [input[:name], input[:value]]} ]
+      elsif @doc
+        Hash[ @doc.css('input[type="hidden"]').map{|input| [input[:name], input[:value]]} ]
+      else
+        []
+      end
+    end
+
+    def easy_captcha image_url
+      temp_file = Tempfile.new(['captcha', '.png'])
+      File.write(temp_file.path, http_client.get_content(image_url))
+
+      img = RTesseract.new(temp_file.path.to_s)
+      img.to_s
     end
   end
 

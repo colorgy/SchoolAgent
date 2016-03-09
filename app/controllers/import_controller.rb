@@ -5,12 +5,7 @@ class ImportController < ApplicationController
   end
 
   def import_course
-    @course_codes = Agent.fetch({
-      studentno: params[:studentno],
-      idcard: params[:idcard],
-      birthday: params[:birthday],
-      password: params[:password]
-    })
+    @course_codes = Agent.agent_class.new.fetch(import_params)
 
     if !@course_codes.blank?
       @courses = CourseAPI.get_courses(@course_codes, current_user)
@@ -25,5 +20,10 @@ class ImportController < ApplicationController
       redirect_to root_path
     end
   end
+
+  private
+    def import_params
+      params.permit(:studentno, :idcard, :birthday, :password)
+    end
 
 end

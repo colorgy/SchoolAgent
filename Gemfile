@@ -31,6 +31,8 @@ gem 'slim-rails'
 gem 'devise', '~> 3.4.0'
 gem 'omniauth-colorgy-oauth2'
 
+gem 'method_source'
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 

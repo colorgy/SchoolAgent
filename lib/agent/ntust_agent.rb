@@ -1,14 +1,17 @@
 require 'rtesseract'
-require_relative './mixins'
 
 module Agent
-class NtustAgent
-  include Agent::Mixins
+class NtustAgent < Agent::Base
+
+  LOGIN_FIELDS = {
+    :studentno => "學號",
+    :idcard => "身份證字號",
+    :birthday => "生日",
+    :password => "密碼"
+  }
 
   def initialize args={}
     http_client.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE
-
-    Dir.mkdir('tmp') unless Dir.exist?('tmp')
 
     @year = (Time.now.month.between?(1, 7) ? Time.now.year - 1 : Time.now.year)
     @term = (Time.now.month.between?(2, 7) ? 2 : 1)
@@ -18,19 +21,19 @@ class NtustAgent
     @base_url = "https://stu255.ntust.edu.tw"
   end
 
-  def fetch studentno: nil, idcard: nil, birthday: nil, password: nil
+  def fetch args={}
+    studentno = args[:studentno]
+    idcard = args[:idcard]
+    birthday = args[:birthday]
+    password = args[:password]
 
-    return if studentno.nil? || idcard.nil? || birthday.nil? || password.nil?
-
+    return unless studentno && idcard && birthday && password
 
     10.times do
       res = http_client.get "#{@base_url}/ntust_stu/stu.aspx", nil, { 'User-Agent' => @user_agent }
       set_doc(res.content)
 
-      # OCR 這幾乎百分百通過的驗證碼（不可質疑你的 Tesseract）
-      File.write(Rails.root.join('tmp', "#{studentno}.png"), http_client.get_content("https://stu255.ntust.edu.tw/ntust_stu/VCode.aspx"))
-      img = RTesseract.new(Rails.root.join('tmp', "#{studentno}.png"))
-      code = img.to_s.gsub(/[^\dA-Z]/,'')
+      code = easy_captcha("https://stu255.ntust.edu.tw/ntust_stu/VCode.aspx").gsub(/[^\dA-Z]/,'')
 
       login_res = http_client.post("#{@base_url}/ntust_stu/stu.aspx", view_state.merge({
         "studentno" => studentno,
