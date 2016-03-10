@@ -4,11 +4,11 @@ module CourseAPI
   class << self
 
     # 先隨便串一下
-    def import course_codes: nil, user_id: nil
+    def import course_codes: nil, user_id: nil, organization_code: nil
       user = User.find(user_id)
-      organization_code = user.organization_code
+      organization_code ||= user.organization_code
 
-      courses_taken = JSON.parse(clnt.get_content("https://colorgy.io:443/api/v1/user_courses.json?filter[user_id]=#{user_id}&filter[year]=#{current_year}&filter[term]=#{current_term}&#{token_param(user)}"))
+      courses_taken = JSON.parse(http_client.get_content("https://colorgy.io:443/api/v1/user_courses.json?filter[user_id]=#{user_id}&filter[year]=#{current_year}&filter[term]=#{current_term}&#{token_param(user)}"))
 
       courses_mapped = get_courses(course_codes, user)
 
@@ -21,14 +21,14 @@ module CourseAPI
       # 需要匯入的課程就有...
       import_courses = courses_mapped.select{ |c| import_codes.include?(c["code"]) }
       import_courses.each do |course|
-        clnt.post(
+        http_client.post(
           "https://colorgy.io:443/api/v1/me/user_courses.json?#{token_param(user)}",
           {
-            'user_courses[course_code]': course["code"],
-            'user_courses[course_organization_code]': organization_code,
-            'user_courses[year]': current_year,
-            'user_courses[term]': current_term,
-            'user_courses[uuid]': SecureRandom.uuid
+            :'user_courses[course_code]'              => course["code"],
+            :'user_courses[course_organization_code]' => organization_code,
+            :'user_courses[year]'                     => current_year,
+            :'user_courses[term]'                     => current_term,
+            :'user_courses[uuid]'                     => SecureRandom.uuid
           }
         )
       end
@@ -38,7 +38,7 @@ module CourseAPI
       org_code = user.organization_code && user.organization_code.downcase || "ntust"
 
       course_codes.map { |gc|
-        JSON.parse(clnt.get_content("https://colorgy.io:443/api/v1/#{org_code}/courses.json?filter[general_code]=#{gc}&filter[year]=#{current_year}&filter[term]=#{current_term}&#{token_param(user)}"))[0]
+        JSON.parse(http_client.get_content("https://colorgy.io:443/api/v1/#{org_code}/courses.json?filter[general_code]=#{gc}&filter[year]=#{current_year}&filter[term]=#{current_term}&#{token_param(user)}"))[0]
       }.reject(&:blank?)
     end
 
@@ -54,7 +54,7 @@ module CourseAPI
       (Time.now.month.between?(2, 7) ? 2 : 1)
     end
 
-    def clnt
+    def http_client
       @http_client ||= HTTPClient.new
     end
   end

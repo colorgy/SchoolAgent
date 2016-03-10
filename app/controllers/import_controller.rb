@@ -5,7 +5,9 @@ class ImportController < ApplicationController
   end
 
   def import_course
-    @course_codes = Agent.agent_class.new.fetch(import_params)
+    agent = Agent.agent_class.new # choose crawler according to user's organization
+    agent.login(import_params)
+    @course_codes = agent.fetch
 
     if !@course_codes.blank?
       @courses = CourseAPI.get_courses(@course_codes, current_user)

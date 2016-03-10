@@ -21,7 +21,7 @@ class NtustAgent < Agent::Base
     @base_url = "https://stu255.ntust.edu.tw"
   end
 
-  def fetch args={}
+  def login args={}
     studentno = args[:studentno]
     idcard = args[:idcard]
     birthday = args[:birthday]
@@ -44,7 +44,6 @@ class NtustAgent < Agent::Base
         "Button1" => "登入系統",
         # "Button2"=>"登出"
       }), { 'User-Agent' => @user_agent })
-
       # manually follow redirection Zzzz
       menu_res = http_client.get "https://stu255.ntust.edu.tw/ntust_stu/stu_menu.aspx", nil, { 'User-Agent' => @user_agent }
       set_doc(menu_res.content)
@@ -55,6 +54,11 @@ class NtustAgent < Agent::Base
         break
       end
     end
+
+  end
+
+  def fetch
+    raise NotLoginYet if !@doc
 
     options = Hash[ @doc.css('input[type="submit"]').map{|d| [d[:name], d[:value]]} ]
     button = options.find{|k, v| v.include?("#{@year-1911}#{@term}查詢")}

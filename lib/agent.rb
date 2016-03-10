@@ -1,7 +1,9 @@
 module Agent
-  class AttributeNotDefined < StandardError; end
 
+  class AttributeNotDefined < StandardError; end
   class AgentNotFound < StandardError; end
+  class MethodNotImplement < StandardError; end
+  class NotLoginYet < StandardError; end
 
   class << self
     def agent_class org_code=nil

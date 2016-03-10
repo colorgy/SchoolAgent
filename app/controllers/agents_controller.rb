@@ -14,7 +14,7 @@ class AgentsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.json { render :json => {login_fields: @agent_class::LOGIN_FIELDS } }
+      format.json { render :json => { login_fields: @agent_class::LOGIN_FIELDS } }
     end
   end
 end
